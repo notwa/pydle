@@ -11,7 +11,7 @@ class MetadataSupport(cap.CapabilityNegotiationSupport):
     def _reset_attributes(self):
         super()._reset_attributes()
 
-        self._pending['metadata'] = {}
+        self._pending_metadata = {}
         self._metadata_info = {}
         self._metadata_queue = []
 
@@ -24,12 +24,12 @@ class MetadataSupport(cap.CapabilityNegotiationSupport):
 
             metadata = yield self.get_metadata('#foo')
         """
-        if target not in self._pending['metadata']:
+        if target not in self._pending_metadata:
             self.rawmsg('METADATA', target, 'LIST')
 
             self._metadata_queue.append(target)
             self._metadata_info[target] = {}
-            self._pending['metadata'][target] = Future()
+            self._pending_metadata[target] = Future()
 
     def set_metadata(self, target, key, value):
         self.rawmsg('METADATA', target, 'SET', key, value)
@@ -82,7 +82,7 @@ class MetadataSupport(cap.CapabilityNegotiationSupport):
         key, visibility = message.params[1:3]
         value = message.params[3] if len(message.params) > 3 else None
 
-        if target not in self._pending['metadata']:
+        if target not in self._pending_metadata:
             return
         if target in self.users:
             self._sync_user(target, targetmeta)
@@ -97,7 +97,7 @@ class MetadataSupport(cap.CapabilityNegotiationSupport):
             return
         nickname = self._metadata_queue.pop()
 
-        future = self._pending['metadata'].pop(nickname)
+        future = self._pending_metadata.pop(nickname)
         future.set_result(self._metadata_info.pop(nickname))
 
     def on_raw_764(self, message):
@@ -108,7 +108,7 @@ class MetadataSupport(cap.CapabilityNegotiationSupport):
         """ Invalid metadata target. """
         target, targetmeta = self._parse_user(message.params[0])
 
-        if target not in self._pending['metadata']:
+        if target not in self._pending_metadata:
             return
         if target in self.users:
             self._sync_user(target, targetmeta)
@@ -116,7 +116,7 @@ class MetadataSupport(cap.CapabilityNegotiationSupport):
         self._metadata_queue.remove(target)
         del self._metadata_info[target]
 
-        future = self._pending['metadata'].pop(target)
+        future = self._pending_metadata.pop(target)
         future.set_result(None)
 
     def on_raw_766(self, message):
