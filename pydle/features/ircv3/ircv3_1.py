@@ -53,7 +53,7 @@ class IRCv3_1Support(sasl.SASLSupport, cap.CapabilityNegotiationSupport, account
         if 'away-notify' not in self._capabilities or not self._capabilities['away-notify']:
             return
 
-        user = self._parse_and_syn_user(message.source)
+        user = self._parse_and_process_user(message.source)
         user.away_message = message.params[0] if len(message.params) > 0 else None
 
     def on_raw_join(self, message):
