@@ -42,7 +42,7 @@ class IRCv3_1Support(sasl.SASLSupport, cap.CapabilityNegotiationSupport, account
         if 'account-notify' not in self._capabilities or not self._capabilities['account-notify']:
             return
 
-        user = self._parse_and_sync_user(message.source)
+        user = self._parse_and_process_user(message.source)
         account = message.params[0]
         if account != NO_ACCOUNT:
             user.account = account
@@ -59,7 +59,7 @@ class IRCv3_1Support(sasl.SASLSupport, cap.CapabilityNegotiationSupport, account
     def on_raw_join(self, message):
         """ Process extended JOIN messages. """
         if 'extended-join' in self._capabilities and self._capabilities['extended-join']:
-            user = self._parse_and_sync_user(message.source)
+            user = self._parse_and_process_user(message.source)
             channels, account, realname = message.params
 
             # Emit a fake join message.

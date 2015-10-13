@@ -13,7 +13,7 @@ class WHOXSupport(isupport.ISUPPORTSupport, account.AccountSupport):
     def on_raw_join(self, message):
         """ Override JOIN to send WHOX. """
         super().on_raw_join(message)
-        user = self._parse_and_sync_user(message.source)
+        user = self._parse_and_process_user(message.source)
         channels = message.params[0].split(',')
 
         if self.is_same_nick(self.nickname, user.nickname):

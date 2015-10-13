@@ -94,7 +94,7 @@ class CTCPSupport(rfc1459.RFC1459Support):
 
     def on_raw_privmsg(self, message):
         """ Modify PRIVMSG to redirect CTCP messages. """
-        user = self._parse_and_sync_user(message.source)
+        user = self._parse_and_process_user(message.source)
         target, msg = message.params
 
         if self.is_channel(target):
@@ -116,7 +116,7 @@ class CTCPSupport(rfc1459.RFC1459Support):
 
     def on_raw_notice(self, message):
         """ Modify NOTICE to redirect CTCP messages. """
-        user = self._parse_and_sync_user(message.source)
+        user = self._parse_and_process_user(message.source)
         target, msg = message.params
 
         if self.is_channel(target):
